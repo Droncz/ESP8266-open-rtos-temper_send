@@ -30,7 +30,8 @@
 #include <rboot-ota/ota-tftp.h>
 #include <rboot-ota/rboot-api.h>
 
-#include <dht/dht.h>
+// #include <dht/dht.h>
+#include "dht.h"
 
 #include "cgi.h"
 #include "urls.h"

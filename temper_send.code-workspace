@@ -5,6 +5,9 @@
 		},
 		{
 			"path": "D:\\IoT\\TOOLS\\esp-open-rtos"
+		},
+		{
+			"path": "C:\\IoT\\TOOLS\\esp-open-rtos"
 		}
 	],
 	"settings": {
