@@ -1,0 +1,15 @@
+PROGRAM=temper_send
+EXTRA_COMPONENTS = extras/paho_mqtt_c extras/rboot-ota extras/libesphttpd extras/i2c extras/dht
+
+LIBESPHTTPD_OTA_TAGNAME ?= generic
+LIBESPHTTPD_MAX_CONNECTIONS ?= 8
+LIBESPHTTPD_STACKSIZE ?= 2048
+ESP_IP = 192.168.1.126
+
+
+PROGRAM_CFLAGS += -DFREERTOS -DLIBESPHTTPD_OTA_TAGNAME="\"$(LIBESPHTTPD_OTA_TAGNAME)\"" -DFLASH_SIZE=$(FLASH_SIZE)
+EXTRA_CFLAGS += -DMEMP_NUM_NETCONN=$(LIBESPHTTPD_MAX_CONNECTIONS)
+
+
+include ${IOT_TOOLS}/esp-open-rtos/common.mk
+# include ../../common.mk

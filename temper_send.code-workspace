@@ -1,0 +1,21 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "D:\\IoT\\TOOLS\\esp-open-rtos"
+		}
+	],
+	"settings": {
+		"files.associations": {
+			"etstimer.h": "c",
+			"freertos.h": "c",
+			"types.h": "c",
+			"esp8266.h": "c",
+			"i2c.h": "c",
+			"httpd.h": "c",
+			"ssid_config.h": "c"
+		}
+	}
+}
