@@ -1,18 +1,3 @@
-/*
-Some random cgi routines. Used in the LED example and the page that returns the entire
-flash as a binary. Also handles the hit counter on the main page.
-*/
-
-/*
- * ----------------------------------------------------------------------------
- * "THE BEER-WARE LICENSE" (Revision 42):
- * Jeroen Domburg <jeroen@spritesmods.com> wrote this file. As long as you retain 
- * this notice you can do whatever you want with this stuff. If we meet some day, 
- * and you think this stuff is worth it, you can buy me a beer in return. 
- * ----------------------------------------------------------------------------
- */
-
-
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -23,7 +8,21 @@ flash as a binary. Also handles the hit counter on the main page.
 
 #include "config.h"
 #include "cgi.h"
-// #include "io.h"
+
+
+//Template code for the counter on the index page.
+static int hitCounter=0;
+int tplCounter(HttpdConnData *connData, char *token, void **arg) {
+	char buff[128];
+	if (token==NULL) return HTTPD_CGI_DONE;
+
+	if (strcmp(token, "counter")==0) {
+		hitCounter++;
+		sprintf(buff, "%d", hitCounter);
+	}
+	httpdSend(connData, buff, -1);
+	return HTTPD_CGI_DONE;
+}
 
 
 //Template code for the led page.
@@ -110,40 +109,41 @@ int cgiSwitch(HttpdConnData *connData) {
 }
 
 
-static int hitCounter=0;
-
-//Template code for the counter on the index page.
-int tplCounter(HttpdConnData *connData, char *token, void **arg) {
+int tplMoisture(HttpdConnData *connData, char *token, void **arg) {
 	char buff[128];
+	// float analogVolts;
+	int chartValue, analogValue;
+
 	if (token==NULL) return HTTPD_CGI_DONE;
 
-	if (strcmp(token, "counter")==0) {
-		hitCounter++;
-		sprintf(buff, "%d", hitCounter);
+	analogValue = sdk_system_adc_read();
+    // analogVolts = (analogValue * 3.08) / 1024;
+    chartValue = 100 - 100 * (analogValue - WET_SENSOR) / (DRY_SENSOR - WET_SENSOR);
+	// sucho = 100 - 100 * (1000 - 400) / 600 = 100 - 100 * 1 = 0
+	// napůl = 100 - 100 * (700 - 400) / 600 = 100 - 100 * 0,5 = 50
+	// mokro = 100 - 100 * (400 - 400) / 600 = 100 - 100 * 0 = 100
+	if (strcmp(token, "analogValue")==0) {
+		sprintf(buff, "%4d", analogValue);
+	// } else if (strcmp(token, "analogVolts")==0) {
+	// 	sprintf(buff, "%5.2f", temperature);
+	} else if (strcmp(token, "chartValue")==0) {
+		sprintf(buff, "%d", chartValue);
 	}
+	
 	httpdSend(connData, buff, -1);
 	return HTTPD_CGI_DONE;
 }
 
 // Template for the index page
-int tplIndex(HttpdConnData *connData, char *token, void **arg) {
+int tplDHT12(HttpdConnData *connData, char *token, void **arg) {
 	char buff[128];
-	// float temperature = 0;
-    // float humidity = 0;
-	// float pressure = 0;
 
 	if (token==NULL) return HTTPD_CGI_DONE;
 
-	// Values reading is done periodically in the "dhtMeasurementTask" task.
-	// dht_read_float_data(SENSOR_TYPE, GPIO_DHT, &humidity, &temperature);
+	// Values reading is done periodically in the "MeasurementTask" task.
 	// printf("Token = %s\n", token);
-	// printf("From HTTP: Humidity: %5.2f%% Temp: %5.2f°C\n", humidity, temperature);
 
-	if (strcmp(token, "counter")==0) {
-		hitCounter++;
-		sprintf(buff, "%d", hitCounter);
-	} 
-	else if (strcmp(token, "temp")==0) {
+	if (strcmp(token, "temp")==0) {
 		sprintf(buff, "%5.2f", temperature);
 		// printf("temp = %5.2f, buff = %s\n", temperature, buff);
 	} 
