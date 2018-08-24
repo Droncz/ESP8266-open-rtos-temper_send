@@ -4,6 +4,7 @@
 #include <task.h>
 #include <queue.h>
 #include <semphr.h>
+#include <timers.h>
 #include <ssid_config.h>
 
 #include <espressif/esp_common.h>
@@ -32,6 +33,7 @@
 
 // #include <dht/dht.h>
 #include "dht.h"
+#include "ssd1306-my.h"
 
 #include "cgi.h"
 #include "urls.h"
@@ -43,9 +45,11 @@
 float temperature = 0;
 float humidity = 0;
 float pressure = 0;
+uint16_t analogValue = 0;
 
 SemaphoreHandle_t wifi_alive;
 QueueHandle_t publish_queue;
+TimerHandle_t scrol_timer_handle = NULL; // Timer handler
 
 static void beat_task(void *pvParameters) {
     char msg[PUB_MSG_LEN];
@@ -262,6 +266,7 @@ void Measurement_task(void *pvParameters)
     gpio_set_pullup(GPIO_DHT, false, false);
  
     while(1) {
+        // DHT sensor reading
         if (dht_read_float_data(SENSOR_TYPE, GPIO_DHT, &humidity, &temperature)) {
             snprintf(msg, PUB_MSG_LEN, "Measurement #%4d: Humidity: %5.2f%% Temp: %5.2fC", count++, humidity, temperature);
             printf("%s\n\r", msg);
@@ -269,7 +274,15 @@ void Measurement_task(void *pvParameters)
                 printf("Publish queue overflow.\r\n");
             }
         } else {
-            printf("Could not read data from sensor\n");
+            printf("Could not read data from DHT12 sensor\n");
+        }
+
+        // Moisture sensor reading
+        if (analogValue = sdk_system_adc_read()) {
+            printf ("ADC value is %4d\r\n", analogValue);
+            // printf ("ADC voltage is %.3f\r\n", 1.0 / 1024 * analogValue);
+        } else {
+            printf("Could not read data from ADC pin\n");
         }
 
         // Delay...
@@ -301,16 +314,30 @@ void user_init(void) {
     uart_set_baud(0, 115200);
     printf("SDK version: %s, free heap %u\n", sdk_system_get_sdk_version(), xPortGetFreeHeapSize());
 
+    // Initialize switch PINs
     gpio_enable(GPIO_LED, GPIO_OUTPUT);
     gpio_write(GPIO_LED, 1);
 
+    // Initialize FS and start HTTP server process
 	espFsInit((void*)(_binary_build_web_espfs_bin_start));
 	httpdInit(builtInUrls, 80);
+
+    // Start OTA TFTP server proces
 	OTAinit();
-    
+
+    // Start Wifi
     wifi_alive = xSemaphoreCreateBinary();
-    publish_queue = xQueueCreate(3, PUB_MSG_LEN);
     xTaskCreate(&wifi_task, "wifi_task", 256, NULL, 2, NULL);
+
+    // Initialize and start task for SSD1306 OLED display
+    ssd1306_init_my();
+    xTaskCreate(ssd1306_task, "ssd1306_task", 256, NULL, 2, NULL);
+    //Scrolling timer
+    scrol_timer_handle = xTimerCreate("fps_timer", 10*SECOND, pdTRUE, NULL, scrolling_timer);
+    xTimerStart(scrol_timer_handle, 0);
+
+    // Start measurement task and MQTT publishing
+    publish_queue = xQueueCreate(3, PUB_MSG_LEN);
     xTaskCreate(&Measurement_task, "Measurement_task", 512, NULL, 3, NULL);
     // xTaskCreate(&beat_task, "beat_task", 256, NULL, 3, NULL);
     xTaskCreate(&mqtt_task, "mqtt_task", 2048, NULL, 4, NULL);

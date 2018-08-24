@@ -18,7 +18,10 @@
 			"esp8266.h": "c",
 			"i2c.h": "c",
 			"httpd.h": "c",
-			"ssid_config.h": "c"
+			"ssid_config.h": "c",
+			"rboot-api.h": "c",
+			"timers.h": "c",
+			"ssd1306.h": "c"
 		}
 	}
 }
