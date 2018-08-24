@@ -5,13 +5,14 @@
  *
  */
 
-#include "dht.h"
-#include "FreeRTOS.h"
-#include "string.h"
-#include "task.h"
-#include "esp/gpio.h"
+#include <FreeRTOS.h>
+#include <string.h>
+#include <task.h>
+#include <esp/gpio.h>
 
 #include <espressif/esp_misc.h> // sdk_os_delay_us
+
+#include "dht.h"
 
 // DHT timer precision in microseconds
 #define DHT_TIMER_INTERVAL 2
