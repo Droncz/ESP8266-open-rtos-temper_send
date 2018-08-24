@@ -7,16 +7,11 @@
 //***********************************************
 
 //******** Definitions for the I2C bus **********
-#define BUS     (0)
-// #define SCL_PIN (1)
-// #define SDA_PIN (2)
+#define I2C_BUS (0)
 #define SCL_PIN (5)
 #define SDA_PIN (4)
 #define I2C_MASTER_WRITE 0x0   /*!< I2C write data */
 #define I2C_MASTER_READ 0x1   /*!< I2C read data */
-// uint8_t slave_addr = 0x5c;
-// uint8_t reg_addr = 0x1f;
-// uint8_t reg_data;
 //***********************************************
 
 //******** DHT senzor definitions ***************
@@ -42,6 +37,32 @@
 // #define PUB_MSG_LEN 16
 //***********************************************
 
+//******** Soil moisture sensor levels **********
+// What are the border levels of the sensor found by testing
+#define DRY_SENSOR 1024
+#define WET_SENSOR 400
+//***********************************************
+
+
+//******** SSD1306 OLED display******************
+// Next line selects I2C or SPI display connection 
+// #define I2C_CONNECTION
+
+// Change this according to you schematics and display size
+#define DISPLAY_WIDTH  128
+#define DISPLAY_HEIGHT 64
+
+#ifdef I2C_CONNECTION
+    #define PROTOCOL SSD1306_PROTO_I2C
+    #define ADDR     SSD1306_I2C_ADDR_0
+#else
+    #define PROTOCOL SSD1306_PROTO_SPI4
+    #define CS_PIN   15
+    #define DC_PIN   12
+#endif
+//***********************************************
+
+
 
 // For the delays...
 #define SECOND (1000 / portTICK_PERIOD_MS)
@@ -50,5 +71,6 @@
 extern float temperature;
 extern float humidity;
 extern float pressure;
+// extern uint16_t analogValue;
 
 #endif // ifndef CONFIG_H
