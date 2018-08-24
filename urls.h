@@ -10,9 +10,11 @@ CgiUploadFlashDef uploadParams={
 HttpdBuiltInUrl builtInUrls[]={
 	{"*", cgiRedirectApClientToHostname, "esp8266.nonet"},
 	{"/", cgiRedirect, "/index.tpl"},
-	{"/index.tpl", cgiEspFsTemplate, tplIndex},
+	{"/index.tpl", cgiEspFsTemplate, tplCounter},
 	{"/switch.tpl", cgiEspFsTemplate, tplSwitch},
 	{"/switch.cgi", cgiSwitch, NULL},
+	{"/dht12.tpl", cgiEspFsTemplate, tplDHT12},
+	{"/moisture.tpl", cgiEspFsTemplate, tplMoisture},
 //	{"/led.tpl", cgiEspFsTemplate, tplLed},
 //	{"/led.cgi", cgiLed, NULL},
 #ifndef ESP32
