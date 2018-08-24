@@ -1,5 +1,5 @@
 PROGRAM=temper_send
-EXTRA_COMPONENTS = extras/paho_mqtt_c extras/rboot-ota extras/libesphttpd extras/i2c extras/dht
+EXTRA_COMPONENTS = extras/paho_mqtt_c extras/rboot-ota extras/libesphttpd extras/i2c extras/dht extras/ssd1306
 
 LIBESPHTTPD_OTA_TAGNAME ?= generic
 LIBESPHTTPD_MAX_CONNECTIONS ?= 8
